@@ -6,6 +6,8 @@ Minecraft Server Launcher(msl.ps1)は、Linux・Windowsに対応したサーバ�
 ・Windows環境でも`save-all flush`をバックアップの直前に呼び出し、サーバを停止せずにより確実なバックアップを取る用途にも使用できるよ。  
 
 ## 使い方
+まずはメモ帳やサクラエディタを使っているならVSCodeを入れよう。一括修正や正確なシンタックスハイライトが無いと、以下の工程は困難になるので。
+https://code.visualstudio.com/
 
 ### Linux
 Linuxの場合はPowerShell Coreをインストールする必要があります。  
