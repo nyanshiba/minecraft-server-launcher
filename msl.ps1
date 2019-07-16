@@ -1,9 +1,9 @@
-#190713
+#190716
 #Minecraft Server Launcher
 param
 (
     [parameter(mandatory)]
-    [String[]]$ServerName, #pwshの場合Arrayの挙動が変
+    [String[]]$Name, #pwshの場合Arrayの挙動が変？
     [parameter(mandatory)]
     [String]$Action
 )
@@ -34,6 +34,7 @@ $Settings =
     InvokeList =
     @(
         #Windows Local
+        #190713
         @{
             #このスクリプトに引数を渡すときのサーバ名 Linuxではscreen名、WindowsではMainWindowTitleになる
             Name = "Test1"
@@ -55,17 +56,11 @@ $Settings =
             hookUrl = 'https://discordapp.com/api/webhooks/XXXXXXXXXX' #External HDD test
         }
         #Linux OkanServer
+        #190716
         @{
             Name = "CBWSurvival"
             Arg = "-DmS CBWSurvival /usr/bin/java -server -Xms12G -Xmx12G -XX:MaxNewSize=3G -XX:MetaspaceSize=3G -XX:MaxMetaspaceSize=3G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=8 -XX:ConcGCThreads=8 -XX:+DisableExplicitGC -jar server.jar nogui"
             Dir = "/home/minecraft/Servers/CBWSurvival"
-        }
-        @{
-            Name = "CBWLab1"
-            Arg = "-DmS CBWLab1 /usr/bin/java -server -Xms4G -Xmx4G -XX:MaxNewSize=1024M -XX:MetaspaceSize=1024M -XX:MaxMetaspaceSize=1024M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=8 -XX:ConcGCThreads=8 -XX:+DisableExplicitGC -jar server.jar nogui"
-            Dir = "/home/minecraft/Servers/CBWLab1"
-            #Dir = "/root/Servers/CBWLab1"
-            #UserName = "Vultr"
         }
         @{
             Name = "CBWLab2_SeaLab"
@@ -111,6 +106,15 @@ $Settings =
             #UserName = "Vultr"
         }
         #Linux Vultr
+        #190716
+        @{
+            Name = "CBWLab1"
+            #Arg = "-DmS CBWLab1 /usr/bin/java -server -Xms4G -Xmx4G -XX:MaxNewSize=1024M -XX:MetaspaceSize=1024M -XX:MaxMetaspaceSize=1024M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=8 -XX:ConcGCThreads=8 -XX:+DisableExplicitGC -jar server.jar nogui"
+            Arg = "-DmS CBWLab1 /usr/bin/java -server -Xms3G -Xmx3G -XX:MaxNewSize=768M -XX:MetaspaceSize=768M -XX:MaxMetaspaceSize=768M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar server.jar"
+            #Dir = "/home/minecraft/Servers/CBWLab1"
+            Dir = "/root/Servers/CBWLab1"
+            UserName = "Vultr"
+        }
         @{
             Name = "BungeeCord"
             Arg = "-DmS BungeeCord /usr/bin/java -server -Xms128M -Xmx128M -XX:MaxNewSize=32M -XX:MetaspaceSize=32M -XX:MaxMetaspaceSize=32M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar BungeeCord.jar"
@@ -317,7 +321,7 @@ function Invoke-SaveAllFlush
 
 #メインルーチン
 #プロセスリストからスクリプトに渡された引数に含まれるもののみを取得
-$Invoke = $Settings.InvokeList | Where-Object {$_.Name -in $ServerName}
+$Invoke = $Settings.InvokeList | Where-Object {$_.Name -in $Name}
 #Windowsが使用される場合.NETクラスを定義する
 if ('Windows' -in $Invoke.OS -Or ($Null -in $Invoke.OS -And $Settings.Global.OS -eq 'Windows'))
 {
