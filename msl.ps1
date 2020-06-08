@@ -15,6 +15,12 @@ $Settings =
     #グローバル設定
     Global =
     @{
+        #RCON(推奨)を使用するか
+        Rcon = $True
+
+        #mcrcon
+        MCRconArg = "-H my.minecraft.server -p password -w 5"
+
         #実行ファイルのパス
         File = "/usr/bin/screen"
 
@@ -42,23 +48,27 @@ $Settings =
         #
         @{
             Name = "CBWLab"
+            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             Arg = "-DmS CBWLab /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java -server -Xms4G -Xmx4G -XX:MaxNewSize=1G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar fabric.jar"
             Dir = "/root/Servers/CBWLab"
             Icon = "https://cdn.discordapp.com/emojis/604356790137782363.png"
         }
         @{
             Name = "CBWMTest"
+            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             Arg = "-DmS CBWMTest /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar fabric.jar"
             Dir = "/root/Servers/CBWMTest"
         }
         @{
             Name = "CBWSnap"
+            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             Arg = "-DmS CBWSnap /usr/lib/jvm/jdk-13.0.2/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar server.jar --forceUpgrade --eraseCache"
             Dir = "/root/Servers/CBWSnap"
             Icon = "https://cdn.discordapp.com/emojis/604360324212326421.png"
         }
         @{
             Name = "Skyblock"
+            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             Arg = "-DmS Skyblock /usr/lib/jvm/jdk-13.0.2/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar server.jar"
             Dir = "/root/Servers/Skyblock"
         }
@@ -66,6 +76,7 @@ $Settings =
         @{
             UserName = "Dedicated CBWSurvival"
             Name = "CBWSurvival"
+            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             Arg = "-DmS CBWSurvival /usr/lib/jvm/jdk-13.0.2/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar server.jar"
             Dir = "/root/Servers/CBWSurvival"
         }
@@ -242,21 +253,30 @@ function Send-CommandToMinecraftConsole
     #カレントディレクトリ
     Set-Location $Profile.Dir -ErrorAction SilentlyContinue
     
-    if ($IsLinux)
+    if ($Profile.Rcon)
     {
-        /usr/bin/screen -p 0 -S "$($Profile.Name)" -X eval "stuff '$Command'\\015"
+        #Rconが有効ならmcrconに引数を渡す(同期実行でTerminal操作対応)
+        Start-Process -FilePath mcrcon -ArgumentList "$($Profile.MCRconArg)","`"$Command`"" -Wait
     }
-    elseif ($IsWindows)
+    elseif (!$Profile.Rcon)
     {
-        #処理するプロセスのMainWindowHandleをMainWindowTitleを参照して見つける
-        $hwnd = (Get-Process | Where-Object {$_.MainWindowTitle -eq "$($Profile.Name)"}).MainWindowHandle
+        #Rconが無効なら、Linuxではscreen、WindowsではPostMessageを使う
+        if ($IsLinux)
+        {
+            /usr/bin/screen -p 0 -S "$($Profile.Name)" -X eval "stuff '$Command'\\015"
+        }
+        elseif ($IsWindows)
+        {
+            #処理するプロセスのMainWindowHandleをMainWindowTitleを参照して見つける
+            $hwnd = (Get-Process | Where-Object {$_.MainWindowTitle -eq "$($Profile.Name)"}).MainWindowHandle
 
-        #PostMassageでBackgroundWindowであってもキーを送る
-        ($Command).ToCharArray() | ForEach-Object -Process {
-            $Null = [Win32API]::PostMessage($hwnd, 0x0100, [Win32API]::VkKeyScan("$_"), 0)
-        } -End {
-            #Enter
-            $Null = [Win32API]::PostMessage($hwnd, 0x0100, 0x0D, 0)
+            #PostMassageでBackgroundWindowであってもキーを送る
+            ($Command).ToCharArray() | ForEach-Object -Process {
+                $Null = [Win32API]::PostMessage($hwnd, 0x0100, [Win32API]::VkKeyScan("$_"), 0)
+            } -End {
+                #Enter
+                $Null = [Win32API]::PostMessage($hwnd, 0x0100, 0x0D, 0)
+            }
         }
     }
     if (!$?)
