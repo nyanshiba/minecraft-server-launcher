@@ -352,13 +352,13 @@ foreach ($profile in ($Settings.Profiles | Where-Object {$_.Name -in $Name}))
         {
             Send-CommandToMinecraftConsole -Profile $profile -Command "say This server will restart after 10 seconds." -Webhook $False
             Start-Sleep -Seconds 10
-            Send-CommandToMinecraftConsole -Profile $profile -Command "stop" -Webhook $False
+            Send-CommandToMinecraftConsole -Profile $profile -Command "stop"
             Start-Sleep -Seconds 5
             Invoke-Process -Profile $profile
         }
         "fastrestart"
         {
-            Send-CommandToMinecraftConsole -Profile $profile -Command "stop" -Webhook $False
+            Send-CommandToMinecraftConsole -Profile $profile -Command "stop"
             Start-Sleep -Seconds 5
             Invoke-Process -Profile $profile
         }
@@ -375,7 +375,7 @@ foreach ($profile in ($Settings.Profiles | Where-Object {$_.Name -in $Name}))
         }
         default
         {
-            Send-CommandToMinecraftConsole -Profile $profile -Command "$_" -Webhook $True
+            Send-CommandToMinecraftConsole -Profile $profile -Command "$_" -Webhook $False
         }
     }
 }
