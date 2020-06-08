@@ -108,7 +108,7 @@ function Send-Webhook
             {
                 {$Null -ne $_ -And '' -ne $_}
                 {
-                    [String]$Servers += "$_`n"
+                    [String]$Running += "$_`n"
                 }
             }
         }
@@ -116,7 +116,18 @@ function Send-Webhook
     elseif ($IsWindows)
     {
         #プロセス一覧から$Settings.Profiles.Nameに該当するウィンドウを探し、投稿内容に追加
-        [String]$Servers = (Get-Process | Where-Object {$_.MainWindowTitle -in $Settings.Profiles.Name}).MainWindowTitle
+        [String]$Running = (Get-Process | Where-Object {$_.MainWindowTitle -in $Settings.Profiles.Name}).MainWindowTitle
+    }
+    if ("" -eq $Running)
+    {
+        $Running = "null"
+    }
+
+    #server.propertiesから設定の一部を取得
+    $ServerProperties = Get-Content ./server.properties | Where-Object {$_ -match 'view-distance|level-name|server-port'} | Out-String
+    if ("" -eq $ServerProperties)
+    {
+        $ServerProperties = "null"
     }
 
     if ($Profile.hookUrl -match "discord")
@@ -153,18 +164,14 @@ function Send-Webhook
                             inline = 'true'
                         },
                         @{
-                            name = "Servers"
-                            value = $Servers
+                            name = "Running"
+                            value = $Running
                             inline = 'true'
                         },
                         @{
-                            name = "Comment"
-                            value = "$(Get-Content ./server.properties | Where-Object {$_ -match 'view-distance|level-name'} | Out-String)."
+                            name = "server.properties"
+                            value = $ServerProperties
                             inline = 'true'
-                        },
-                        @{
-                            name = "Source"
-                            value = "https://gist.github.com/nyanshiba/deed14b985acfb203c519746d6cea857"
                         }
                     )
                 }
