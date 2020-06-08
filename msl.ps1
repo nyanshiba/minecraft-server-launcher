@@ -355,6 +355,17 @@ foreach ($profile in ($Settings.Profiles | Where-Object {$_.Name -in $Name}))
             Start-Sleep -Seconds 5
             Invoke-Process -Profile $profile
         }
+        "t"
+        {
+            if ($profile.Rcon)
+            {
+                Send-CommandToMinecraftConsole -Profile $profile -Command "-t" -Webhook $False
+            }
+            elseif (!$profile.Rcon)
+            {
+                throw "Exception: Please enable Rcon if you want to use Rcon Terminal"
+            }
+        }
         default
         {
             Send-CommandToMinecraftConsole -Profile $profile -Command "$_" -Webhook $True
