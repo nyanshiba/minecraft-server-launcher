@@ -295,6 +295,10 @@ function Send-CommandToMinecraftConsole
     }
     #Webhook
     Send-Webhook -Profile $Profile -Command $Command -Webhook $Webhook -Success $True
+
+    #latest.log
+    Start-Sleep -Seconds 1
+    Get-Content ./logs/latest.log | Select-Object -Last 1
 }
 
 #メインルーチン
