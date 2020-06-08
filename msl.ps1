@@ -228,7 +228,7 @@ function Invoke-Process
         #Webhook(例外)
         Send-Webhook -Profile $Profile -Command 'start' -Webhook $Webhook -Success $False
         #関数を抜ける
-        return
+        throw "Exception: Failed to start the server"
     }
     #WindowsではMainWindowTitleを設定する
     if ($IsWindows)
@@ -291,7 +291,7 @@ function Send-CommandToMinecraftConsole
         #Webhook(例外)
         Send-Webhook -Profile $Profile -Command $Command -Webhook $Webhook -Success $False
         #関数を抜ける
-        return
+        throw "Exception: Command execution failed"
     }
     #Webhook
     Send-Webhook -Profile $Profile -Command $Command -Webhook $Webhook -Success $True
