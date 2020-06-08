@@ -188,7 +188,6 @@ function Invoke-Process
     param
     (
         [Hashtable]$Profile,
-        [String]$Command,
         [Bool]$Webhook = $True
     )
     Write-Output "Invoke-Process"
