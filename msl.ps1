@@ -12,7 +12,7 @@ param
 #ユーザ設定
 $Settings =
 @{
-    #グローバル設定
+    #グローバル設定(既定値)
     Global =
     @{
         #RCON(推奨)を使用するか
@@ -42,42 +42,35 @@ $Settings =
         #Webhook Url
         hookUrl = 'https://discordapp.com/api/webhooks/XXXXXXXXXX' #Project:CBW server-info
     }
-    #各サーバ毎の設定
+    #各サーバ毎の設定(既定値を上書き)
     Profiles =
     @(
         #
         @{
             Name = "CBWLab"
+            #Rcon = $True
             MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
+            #File = "/usr/bin/screen"
             Arg = "-DmS CBWLab /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java -server -Xms4G -Xmx4G -XX:MaxNewSize=1G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar fabric.jar"
             Dir = "/root/Servers/CBWLab"
+            #Window = 'Minimized'
+            #UserName = "Cloud Compute CBWLab"
             Icon = "https://cdn.discordapp.com/emojis/604356790137782363.png"
-        }
-        @{
-            Name = "CBWMTest"
-            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
-            Arg = "-DmS CBWMTest /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar fabric.jar"
-            Dir = "/root/Servers/CBWMTest"
+            #hookUrl = 'https://discordapp.com/api/webhooks/XXXXXXXXXX'
         }
         @{
             Name = "CBWSnap"
-            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
-            Arg = "-DmS CBWSnap /usr/lib/jvm/jdk-13.0.2/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar server.jar --forceUpgrade --eraseCache"
+            MCRconArg = "-H 127.0.0.1 -P 25574 -p ThisIsNotARealPassword -w 5"
+            Arg = "-DmS CBWSnap /usr/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar server.jar --forceUpgrade --eraseCache"
             Dir = "/root/Servers/CBWSnap"
             Icon = "https://cdn.discordapp.com/emojis/604360324212326421.png"
-        }
-        @{
-            Name = "Skyblock"
-            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
-            Arg = "-DmS Skyblock /usr/lib/jvm/jdk-13.0.2/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar server.jar"
-            Dir = "/root/Servers/Skyblock"
         }
         #
         @{
             UserName = "Dedicated CBWSurvival"
             Name = "CBWSurvival"
             MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
-            Arg = "-DmS CBWSurvival /usr/lib/jvm/jdk-13.0.2/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar server.jar"
+            Arg = "-DmS CBWSurvival /usr/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar server.jar"
             Dir = "/root/Servers/CBWSurvival"
         }
     )
