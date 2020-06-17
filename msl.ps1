@@ -258,7 +258,7 @@ function Send-CommandToMinecraftConsole
     if ($Profile.Rcon)
     {
         #Rconが有効ならmcrconに引数を渡す(同期実行でTerminal操作対応)
-        Start-Process -FilePath "$($Profile.MCRconPath)" -ArgumentList "$($Profile.MCRconArg)","`"$Command`"" -Wait
+        Start-Process -FilePath "$($Profile.MCRconPath)" -ArgumentList "$($Profile.MCRconArg)","`"$Command`"" -Wait -NoNewWindow
     }
     elseif (!$Profile.Rcon)
     {
