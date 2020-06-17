@@ -18,7 +18,10 @@ $Settings =
         #RCON(推奨)を使用するか
         Rcon = $True
 
-        #mcrcon
+        #mcrconの実行ファイルパス
+        MCRconPath = "/usr/local/bin/mcrcon"
+
+        #mcrcon引数
         MCRconArg = "-H my.minecraft.server -p password -w 5"
 
         #実行ファイルのパス
@@ -255,7 +258,7 @@ function Send-CommandToMinecraftConsole
     if ($Profile.Rcon)
     {
         #Rconが有効ならmcrconに引数を渡す(同期実行でTerminal操作対応)
-        Start-Process -FilePath mcrcon -ArgumentList "$($Profile.MCRconArg)","`"$Command`"" -Wait
+        Start-Process -FilePath "$($Profile.MCRconPath)" -ArgumentList "$($Profile.MCRconArg)","`"$Command`"" -Wait
     }
     elseif (!$Profile.Rcon)
     {
