@@ -203,7 +203,7 @@ function Invoke-Process
     #>
     
     #カレントディレクトリ
-    Set-Location $Profile.Dir -ErrorAction SilentlyContinue
+    Push-Location $Profile.Dir -ErrorAction SilentlyContinue
 
     #Process
     $ps = New-Object System.Diagnostics.Process
@@ -224,6 +224,11 @@ function Invoke-Process
         Send-Webhook -Profile $Profile -Command 'start' -Webhook $Webhook -Success $False
         #関数を抜ける
         throw "Exception: Failed to start the server"
+    }
+    finally
+    {
+        #カレントディレクトリを戻す
+        Pop-Location
     }
     #WindowsではMainWindowTitleを設定する
     if ($IsWindows)
@@ -253,7 +258,7 @@ function Send-CommandToMinecraftConsole
     Write-Output "Send-CommandToMinecraftConsole $Command"
 
     #カレントディレクトリ
-    Set-Location $Profile.Dir -ErrorAction SilentlyContinue
+    Push-Location $Profile.Dir -ErrorAction SilentlyContinue
     
     if ($Profile.Rcon)
     {
@@ -281,6 +286,10 @@ function Send-CommandToMinecraftConsole
             }
         }
     }
+
+    #カレントディレクトリを戻す
+    Pop-Location
+
     if (!$?)
     {
         #Webhook(例外)
