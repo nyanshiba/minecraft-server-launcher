@@ -196,17 +196,18 @@ function Invoke-Process
     Write-Output "Invoke-Process"
 
     #Process
-    $ps = New-Object System.Diagnostics.Process
-    $ps.StartInfo.Filename = $Profile.File
-    $ps.StartInfo.Arguments = $Profile.Arg
-    $ps.StartInfo.WorkingDirectory = $Profile.Dir
-    if ($IsWindows)
-    {
-        $ps.StartInfo.WindowStyle = $Profile.Window
-    }
     try
     {
-        $Null = $ps.Start()
+        if ($IsWindows)
+        {
+            #別のPowerShellプロセス内でプロセスを実行し、WindowTitleをPowerShellの機能で設定する
+            Start-Process -FilePath pwsh -ArgumentList '-Command', "`$Host.UI.RawUI.WindowTitle = '$($Profile.Name)'; & $($Profile.File) $($Profile.Arg)" -WorkingDirectory $Profile.Dir -WindowStyle $Profile.Window -ErrorAction Stop
+        }
+        if ($IsLinux)
+        {
+            #screenかjavaかはユーザ設定に委ねる
+            Start-Process -FilePath $Profile.File -ArgumentList $Profile.Arg -WorkingDirectory $Profile.Dir -WindowStyle $Profile.Window -ErrorAction Stop
+        }
     }
     catch
     {
@@ -214,17 +215,6 @@ function Invoke-Process
         Send-Webhook -Profile $Profile -Command 'start' -Webhook $Webhook -Success $False
         #関数を抜ける
         throw "Exception: Failed to start the server"
-    }
-    #WindowsではMainWindowTitleを設定する
-    if ($IsWindows)
-    {
-        #MainWindowHandleが設定されるまで待つ
-        while ($ps.MainWindowHandle -eq 0)
-        {
-            Start-Sleep -Milliseconds 100
-        }
-        #MainWindowTitleを$Profile.Nameに
-        $Null = [Win32API]::SetWindowText($ps.MainWindowHandle, $Profile.Name)
     }
     #Webhook
     Send-Webhook -Profile $Profile -Command 'start' -Webhook $Webhook -Success $True
@@ -296,8 +286,6 @@ if ($IsWindows)
     public class Win32API {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr PostMessage(int hWnd, UInt32 Msg, int wParam, int lParam);
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern bool SetWindowText(IntPtr hwnd, String lpString);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int VkKeyScan(char ch);
     }
