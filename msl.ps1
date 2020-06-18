@@ -218,7 +218,7 @@ function Invoke-Process
         if ($IsLinux)
         {
             #screenかjavaかはユーザ設定に委ねる
-            Start-Process -FilePath $Profile.File -ArgumentList $Profile.Arg -WorkingDirectory $Profile.Dir -WindowStyle $Profile.Window -ErrorAction Stop
+            Start-Process -FilePath $Profile.File -ArgumentList $Profile.Arg -WorkingDirectory $Profile.Dir -ErrorAction Stop
         }
     }
     catch
