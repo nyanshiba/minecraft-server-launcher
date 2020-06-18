@@ -120,7 +120,7 @@ function Send-Webhook
     }
 
     #server.propertiesから設定の一部を取得
-    $ServerProperties = Get-Content ./server.properties | Where-Object {$_ -match 'view-distance|level-name|server-port'} | Out-String
+    $ServerProperties = Get-Content "$($Profile.Dir)/server.properties" | Where-Object {$_ -match 'view-distance|level-name|server-port'} | Out-String
     if ("" -eq $ServerProperties)
     {
         $ServerProperties = "null"
@@ -195,16 +195,6 @@ function Invoke-Process
     )
     Write-Output "Invoke-Process"
 
-    #param一覧
-    <#
-    (Get-Command -Name $MyInvocation.MyCommand).Parameters.Keys | ForEach-Object {
-        Get-Variable -Name $_ -ErrorAction SilentlyContinue
-    }
-    #>
-    
-    #カレントディレクトリ
-    Push-Location $Profile.Dir -ErrorAction SilentlyContinue
-
     #Process
     $ps = New-Object System.Diagnostics.Process
     $ps.StartInfo.Filename = $Profile.File
@@ -224,11 +214,6 @@ function Invoke-Process
         Send-Webhook -Profile $Profile -Command 'start' -Webhook $Webhook -Success $False
         #関数を抜ける
         throw "Exception: Failed to start the server"
-    }
-    finally
-    {
-        #カレントディレクトリを戻す
-        Pop-Location
     }
     #WindowsではMainWindowTitleを設定する
     if ($IsWindows)
@@ -256,9 +241,6 @@ function Send-CommandToMinecraftConsole
     )
 
     Write-Output "Send-CommandToMinecraftConsole $Command"
-
-    #カレントディレクトリ
-    Push-Location $Profile.Dir -ErrorAction SilentlyContinue
     
     if ($Profile.Rcon)
     {
@@ -289,10 +271,7 @@ function Send-CommandToMinecraftConsole
 
     #latest.log
     Start-Sleep -Seconds 1
-    Get-Content ./logs/latest.log | Select-Object -Last 1
-    
-    #カレントディレクトリを戻す
-    Pop-Location
+    Get-Content "$($Profile.Dir)/logs/latest.log" | Select-Object -Last 1
 
     if (!$?)
     {
