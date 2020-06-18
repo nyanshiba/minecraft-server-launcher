@@ -37,7 +37,7 @@ $Settings =
         Window = 'Minimized'
 
         #Webhook時のusername(Discordのみ)
-        UserName = "Cloud Compute CBWLab"
+        UserName = "Linux Server 1"
 
         #icon
         Icon = "https://cdn.discordapp.com/emojis/604360349461774336.png"
@@ -48,10 +48,11 @@ $Settings =
     #各サーバ毎の設定(既定値を上書き)
     Profiles =
     @(
-        #
+        #Linux Server 1
         @{
             Name = "CBWLab"
             #Rcon = $True
+            #MCRconPath = "/usr/local/bin/mcrcon"
             MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             #File = "/usr/bin/screen"
             Arg = "-DmS CBWLab /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java -server -Xms4G -Xmx4G -XX:MaxNewSize=1G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar fabric.jar"
@@ -68,13 +69,24 @@ $Settings =
             Dir = "/root/Servers/CBWSnap"
             Icon = "https://cdn.discordapp.com/emojis/604360324212326421.png"
         }
-        #
+        #Linux Server 2
         @{
-            UserName = "Dedicated CBWSurvival"
+            UserName = "Linux Server 2"
             Name = "CBWSurvival"
             MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             Arg = "-DmS CBWSurvival /usr/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar server.jar"
             Dir = "/root/Servers/CBWSurvival"
+        }
+        #Windows Server 1
+        @{
+            UserName = "Windows Server 1"
+            Name = "CBWSurvivalTest"
+            MCRconPath = "C:\bin\mcrcon-0.7.1-windows-x86-32\mcrcon.exe"
+            MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
+            File = "C:\bin\jdk-14.0.1\bin\java.exe"
+            Arg = "-server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar ../versions/server-1.15.2.jar"
+            Dir = "C:\Minecraft\CBWSurvival"
+            hookUrl = 'https://discordapp.com/api/webhooks/ZZZZZZZZZZ'
         }
     )
 }
