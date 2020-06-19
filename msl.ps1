@@ -126,7 +126,7 @@ function Send-Webhook
         #プロセス一覧から$Settings.Profiles.Nameに該当するウィンドウを探し、投稿内容に追加
         [String]$Running = (Get-Process | Where-Object {$_.MainWindowTitle -in $Settings.Profiles.Name}).MainWindowTitle
     }
-    if ("" -eq $Running)
+    if ($Null -eq $Running -Or "" -eq $Running)
     {
         $Running = "null"
     }
