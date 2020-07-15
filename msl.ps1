@@ -24,8 +24,8 @@ $Settings =
         #mcrcon引数
         MCRconArg = "-H my.minecraft.server -p password -w 5"
 
-        #実行ファイルのパス
-        File = "/usr/bin/screen"
+        #実行ファイルのパス(Windowsではpwsh.exe、Linuxでは/usr/bin/tmux内で実行される)
+        File = "/usr/bin/java"
 
         #JVM引数 値は各環境のRAMの量、CPUコア数に見合った値にする
         Arg = ""
@@ -54,8 +54,8 @@ $Settings =
             #Rcon = $True
             #MCRconPath = "/usr/local/bin/mcrcon"
             MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
-            #File = "/usr/bin/screen"
-            Arg = "-DmS CBWLab /usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java -server -Xms4G -Xmx4G -XX:MaxNewSize=1G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar fabric.jar"
+            File = "/usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/java"
+            Arg = "-server -Xms4G -Xmx4G -XX:MaxNewSize=1G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar fabric.jar"
             Dir = "/root/Servers/CBWLab"
             #Window = 'Minimized'
             #UserName = "Cloud Compute CBWLab"
@@ -65,7 +65,7 @@ $Settings =
         @{
             Name = "CBWSnap"
             MCRconArg = "-H 127.0.0.1 -P 25574 -p ThisIsNotARealPassword -w 5"
-            Arg = "-DmS CBWSnap /usr/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar server.jar --forceUpgrade --eraseCache"
+            Arg = "-server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:+DisableExplicitGC -jar server.jar --forceUpgrade --eraseCache"
             Dir = "/root/Servers/CBWSnap"
             Icon = "https://cdn.discordapp.com/emojis/604360324212326421.png"
         }
@@ -74,7 +74,7 @@ $Settings =
             UserName = "Linux Server 2"
             Name = "CBWSurvival"
             MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
-            Arg = "-DmS CBWSurvival /usr/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar server.jar"
+            Arg = "/usr/bin/java -server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar server.jar"
             Dir = "/root/Servers/CBWSurvival"
         }
         #Windows Server 1
@@ -84,7 +84,7 @@ $Settings =
             MCRconPath = "C:\bin\mcrcon-0.7.1-windows-x86-32\mcrcon.exe"
             MCRconArg = "-H 127.0.0.1 -P 25575 -p ThisIsNotARealPassword -w 5"
             File = "C:\bin\jdk-14.0.1\bin\java.exe"
-            Arg = "-server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar ../versions/server-1.15.2.jar"
+            Arg = "-server -Xms7G -Xmx7G -XX:MaxNewSize=1792M -XX:MetaspaceSize=1792M -XX:MaxMetaspaceSize=1792M -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:+DisableExplicitGC -jar ../versions/server-1.15.2.jar nogui"
             Dir = "C:\Minecraft\CBWSurvival"
             hookUrl = 'https://discordapp.com/api/webhooks/ZZZZZZZZZZ'
         }
@@ -217,8 +217,10 @@ function Invoke-Process
         }
         if ($IsLinux)
         {
-            #screenかjavaかはユーザ設定に委ねる
-            Start-Process -FilePath $Profile.File -ArgumentList $Profile.Arg -WorkingDirectory $Profile.Dir -ErrorAction Stop
+            #screenではなくtmuxを使用する tmuxはStart-Processを壊す
+            Push-Location -Path $Profile.Dir
+            /usr/bin/tmux new-session -ds "$($Profile.Name)" "$($Profile.File) $($Profile.Arg)"
+            Pop-Location
         }
     }
     catch
@@ -251,10 +253,10 @@ function Send-CommandToMinecraftConsole
     }
     elseif (!$Profile.Rcon)
     {
-        #Rconが無効なら、Linuxではscreen、WindowsではPostMessageを使う
+        #Rconが無効なら、Linuxではtmux、WindowsではPostMessageを使う
         if ($IsLinux)
         {
-            /usr/bin/screen -p 0 -S "$($Profile.Name)" -X eval "stuff '$Command'\\015"
+            /usr/bin/tmux send-keys -t "$($Profile.Name)" "$Command" ENTER
         }
         elseif ($IsWindows)
         {
