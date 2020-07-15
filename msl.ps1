@@ -109,10 +109,10 @@ function Send-Webhook
 
     if ($IsLinux)
     {
-        #screenプロセス一覧を投稿内容に追加
-        foreach ($line in /usr/bin/screen -ls)
+        #tmuxプロセス一覧を投稿内容に追加
+        foreach ($line in /usr/bin/tmux ls)
         {
-            switch ([Regex]::Split($line, '\t|\.')[2])
+            switch ($line -Split ':' | Select-Object -Index 0)
             {
                 {$Null -ne $_ -And '' -ne $_}
                 {
