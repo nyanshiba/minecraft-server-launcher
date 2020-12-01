@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 #Minecraft Server Launcher
 #requires -version 7
 
