@@ -45,6 +45,9 @@ $Settings =
 
         #Webhook Url
         hookUrl = 'https://discordapp.com/api/webhooks/XXXXXXXXXX' #Project:CBW server-info
+
+        #Webhookするserver.propertiesの設定内容
+        PostProperties = "simulation-distance|view-distance|level-name|server-port|difficulty"
     }
     #各サーバ毎の設定(既定値を上書き)
     Profiles =
@@ -62,6 +65,7 @@ $Settings =
             #UserName = "Cloud Compute CBWLab"
             Icon = "https://cdn.discordapp.com/emojis/604356790137782363.png"
             #hookUrl = 'https://discordapp.com/api/webhooks/XXXXXXXXXX'
+            #PostProperties = "simulation-distance|view-distance|level-name|server-port|difficulty"
         }
         @{
             Name = "CBWSnap"
@@ -133,7 +137,7 @@ function Send-Webhook
     }
 
     #server.propertiesから設定の一部を取得
-    $ServerProperties = Get-Content "$($Profile.Dir)/server.properties" | Where-Object {$_ -match 'view-distance|level-name|server-port'} | Out-String
+    $ServerProperties = Get-Content "$($Profile.Dir)/server.properties" | Where-Object {$_ -match $Profile.PostProperties} | Out-String
     if ("" -eq $ServerProperties)
     {
         $ServerProperties = "null"
