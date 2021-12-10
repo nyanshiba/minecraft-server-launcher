@@ -102,9 +102,9 @@ function Send-Webhook
     param
     (
         [Hashtable]$Profile,
-        [String]$Command,
-        [Bool]$Webhook,
-        [Bool]$Success
+        [String]$Command = 'null',
+        [Bool]$Webhook = $False,
+        [Bool]$Success = $False
     )
 
     if ($Null -eq $Profile.hookurl -Or !$Webhook)
@@ -152,7 +152,7 @@ function Send-Webhook
 
     if ($Profile.hookUrl -match "discord")
     {
-        Write-Output "Webhook: Discord"
+        Write-Host "Webhook: Discord"
         $payload =
         [PSCustomObject]@{
             username = $Profile.UserName
@@ -200,7 +200,7 @@ function Send-Webhook
     }
     elseif ($Profile.hookUrl -match "slack")
     {
-        Write-Output "Webhook: Slack"
+        Write-Host "Webhook: Slack"
         $payload = [PSCustomObject]@{
             text = $Content
             #usernameはSlack側で設定する
@@ -217,7 +217,7 @@ function Invoke-Process
         [Hashtable]$Profile,
         [Bool]$Webhook = $True
     )
-    Write-Output "Invoke-Process"
+    Write-Host "Invoke-Process"
 
     #Process
     try
@@ -257,11 +257,11 @@ function Send-CommandToMinecraftConsole
     param
     (
         [Hashtable]$Profile,
-        [String]$Command,
+        [String]$Command = 'list',
         [Bool]$Webhook = $True
     )
 
-    Write-Output "Send-CommandToMinecraftConsole $Command"
+    Write-Host "Send-CommandToMinecraftConsole $Command"
     
     if ($Profile.Rcon)
     {
@@ -309,7 +309,7 @@ function Send-CommandToMinecraftConsole
 #Windowsの場合.NETクラスを定義する
 if ($IsWindows)
 {
-    Write-Output "using .NET Class"
+    Write-Host "using .NET Class"
     Add-Type -AssemblyName System.Windows.Forms
     Add-Type @"
     using System;
