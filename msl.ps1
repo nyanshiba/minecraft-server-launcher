@@ -319,7 +319,7 @@ foreach ($profile in ($Settings.Profiles | Where-Object {$_.Name -in $Name}))
         }
     }
 
-    $profile
+    $profile | Select-Object -Property Name, Rcon, File, Arg, Dir, Window
 
     #起動・停止関数を呼ぶ
     switch ($Action)
