@@ -112,7 +112,14 @@ function Send-Webhook
         return
     }
 
-    if ($IsLinux)
+    if ($IsLinux -And $Profile.Rcon)
+    {
+        #javaプロセスのmxe.nameを抜き出す
+        (Get-Process java -ErrorAction SilentlyContinue).CommandLine | ForEach-Object {
+            [String]$Running += [Regex]::Replace($_, "^.*-Dmxe.name=\'*(\w+)\'*.*-.*$", { $args.Groups[1].Value })
+        }
+    }
+    elseif ($IsLinux -And !$Profile.Rcon)
     {
         #tmuxプロセス一覧を投稿内容に追加
         foreach ($line in /usr/bin/tmux ls)
@@ -220,7 +227,12 @@ function Invoke-Process
             #別のPowerShellプロセス内でプロセスを実行し、WindowTitleをPowerShellの機能で設定する
             Start-Process -FilePath pwsh -ArgumentList '-Command', "`$Host.UI.RawUI.WindowTitle = '$($Profile.Name)'; & $($Profile.File) $($Profile.Arg)" -WorkingDirectory $Profile.Dir -WindowStyle $Profile.Window -ErrorAction Stop
         }
-        if ($IsLinux)
+        elseif ($IsLinux -And $Profile.Rcon)
+        {
+            #rconがあればscreenやtmuxは不要なので、nohupで実行 プロセスを見分けられるようにmxe.nameに名前を追加する
+            Start-Process -FilePath "/usr/bin/nohup" -ArgumentList "$($Profile.File) -Dmxe.name='$($Profile.Name)' $($Profile.Arg)" -RedirectStandardOutput "/dev/null" -WorkingDirectory $Profile.Dir -ErrorAction Stop
+        }
+        elseif ($IsLinux -And !$Profile.Rcon)
         {
             #screenではなくtmuxを使用する tmuxはStart-Processを壊す
             Push-Location -Path $Profile.Dir
