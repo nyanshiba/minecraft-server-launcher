@@ -324,6 +324,23 @@ foreach ($profile in ($Settings.Profiles | Where-Object {$_.Name -in $Name}))
     #起動・停止関数を呼ぶ
     switch ($Action)
     {
+        "help"
+        {
+            Write-Host @"
+Usage:
+pwsh msl.ps1 -Name <Profile Name> -Action <start|stop|restart|help|...>
+./msl.ps1 <Profile Name> <start|stop|restart|help|...>
+
+help        this
+start       Launch minecraft server
+stop        Send 'stop' to minecraft server after 10 seconds
+faststop    Send 'stop' to minecraft server immidiately
+restart     Send 'stop' to minecraft server after 10 seconds, then start minecraft server
+fastrestart Send 'stop' to minecraft server immidiately, then start minecraft server
+t           Attach to minecraft server console (requires Rcon)
+'command'   Send 'command' to minecraft server. example: ./msl.ps1 CBWSurvival 'list'
+"@
+        }
         "start"
         {
             Invoke-Process -Profile $profile
