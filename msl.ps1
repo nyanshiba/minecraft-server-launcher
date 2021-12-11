@@ -116,7 +116,7 @@ function Send-Webhook
     {
         #javaプロセスのmxe.nameを抜き出す
         (Get-Process java -ErrorAction SilentlyContinue).CommandLine | ForEach-Object {
-            [String]$Running += [Regex]::Replace($_, "^.*-Dmxe.name=\'*(\w+)\'*.*-.*$", { $args.Groups[1].Value })
+            [String]$Running += [Regex]::Replace($_, "^.*-Dmxe.name=\'*(\w+)\'*.*-.*$", { $args.Groups[1].Value + "`n" })
         }
     }
     elseif ($IsLinux -And !$Profile.Rcon)
