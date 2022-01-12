@@ -263,44 +263,47 @@ function Send-CommandToMinecraftConsole
 
     Write-Host "Send-CommandToMinecraftConsole $Command"
     
-    if ($Profile.Rcon)
+    try
     {
-        #Rconが有効ならmcrconに引数を渡す(同期実行でTerminal操作対応)
-        Start-Process -FilePath "$($Profile.MCRconPath)" -ArgumentList "$($Profile.MCRconArg)","`"$Command`"" -Wait -NoNewWindow
-    }
-    elseif (!$Profile.Rcon)
-    {
-        #Rconが無効なら、Linuxではtmux、WindowsではPostMessageを使う
-        if ($IsLinux)
+        if ($Profile.Rcon)
         {
-            /usr/bin/tmux send-keys -t "$($Profile.Name)" "$Command" ENTER
+            #Rconが有効ならmcrconに引数を渡す(同期実行でTerminal操作対応)
+            Start-Process -FilePath "$($Profile.MCRconPath)" -ArgumentList "$($Profile.MCRconArg)","`"$Command`"" -Wait -NoNewWindow
         }
-        elseif ($IsWindows)
+        elseif (!$Profile.Rcon)
         {
-            #処理するプロセスのMainWindowHandleをMainWindowTitleを参照して見つける
-            $hwnd = (Get-Process | Where-Object {$_.MainWindowTitle -eq "$($Profile.Name)"}).MainWindowHandle
-
-            #PostMassageでBackgroundWindowであってもキーを送る
-            ($Command).ToCharArray() | ForEach-Object -Process {
-                $Null = [Win32API]::PostMessage($hwnd, 0x0100, [Win32API]::VkKeyScan("$_"), 0)
-            } -End {
-                #Enter
-                $Null = [Win32API]::PostMessage($hwnd, 0x0100, 0x0D, 0)
+            #Rconが無効なら、Linuxではtmux、WindowsではPostMessageを使う
+            if ($IsLinux)
+            {
+                /usr/bin/tmux send-keys -t "$($Profile.Name)" "$Command" ENTER
             }
+            elseif ($IsWindows)
+            {
+                #処理するプロセスのMainWindowHandleをMainWindowTitleを参照して見つける
+                $hwnd = (Get-Process | Where-Object {$_.MainWindowTitle -eq "$($Profile.Name)"}).MainWindowHandle
+
+                #PostMassageでBackgroundWindowであってもキーを送る
+                ($Command).ToCharArray() | ForEach-Object -Process {
+                    $Null = [Win32API]::PostMessage($hwnd, 0x0100, [Win32API]::VkKeyScan("$_"), 0)
+                } -End {
+                    #Enter
+                    $Null = [Win32API]::PostMessage($hwnd, 0x0100, 0x0D, 0)
+                }
+            }
+
+            #latest.log
+            Start-Sleep -Seconds 1
+            Get-Content "$($Profile.Dir)/logs/latest.log" | Select-Object -Last 1
         }
     }
-
-    #latest.log
-    Start-Sleep -Seconds 1
-    Get-Content "$($Profile.Dir)/logs/latest.log" | Select-Object -Last 1
-
-    if (!$?)
+    catch
     {
         #Webhook(例外)
         Send-Webhook -Profile $Profile -Command $Command -Webhook $Webhook -Success $False
         #関数を抜ける
         throw "Exception: Command execution failed"
     }
+
     #Webhook
     Send-Webhook -Profile $Profile -Command $Command -Webhook $Webhook -Success $True
 }
