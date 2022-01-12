@@ -338,7 +338,7 @@ foreach ($profile in ($Settings.Profiles | Where-Object {$_.Name -in $Name}))
         }
     }
 
-    $profile | Select-Object -Property Name, Rcon, File, Arg, Dir | Out-String
+    Write-Host ($profile | Select-Object -Property Name, Rcon, File, Arg, Dir | Out-String)
 
     #起動・停止関数を呼ぶ
     switch ($Action)
